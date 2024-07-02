@@ -31,7 +31,7 @@ class EuroState(StatesGroup):
     new_euro_cur = State()
 
 
-bot_db = BoT_DB('courses.db')
+bot_db = BoT_DB('/data/courses.db')
 dp = Dispatcher(storage=MemoryStorage())
 
 
