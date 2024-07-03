@@ -29,3 +29,7 @@ class BoT_DB:
     def update_euro(self, new_cur):
         self.cursor.execute("UPDATE `exchange_rates` SET `euro` = ? WHERE `id` = 1", (new_cur,))
         return self.db.commit()
+
+    def get_current(self):
+        result = self.cursor.execute("SELECT * FROM `exchange_rates`")
+        return result.fetchone()

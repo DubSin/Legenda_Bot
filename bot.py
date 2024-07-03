@@ -41,7 +41,8 @@ async def admin_command(msg: types.Message):
         yuan_btn = types.InlineKeyboardButton(text='Курс Юань', callback_data='yuan')
         dollar_btn = types.InlineKeyboardButton(text='Курс Доллара', callback_data='dollar')
         euro_btn = types.InlineKeyboardButton(text='Курс Евро', callback_data='euro')
-        keyboard = InlineKeyboardBuilder().add(yuan_btn).add(dollar_btn).add(euro_btn)
+        current_btn = types.InlineKeyboardButton(text='Текущие курсы', callback_data='current')
+        keyboard = InlineKeyboardBuilder().add(yuan_btn).add(dollar_btn).add(euro_btn).add(current_btn)
         await msg.reply('Приветствую в панели админа', reply_markup=keyboard.as_markup())
 
 
@@ -50,6 +51,16 @@ async def process_callback_user(callback_query: types.CallbackQuery, bot: Bot, s
     await bot.answer_callback_query(callback_query.id)
     await callback_query.message.answer('Введите новый курс (отделяйте дробную часть точкой)')
     await state.set_state(YuanState.new_yuan_cur)
+
+
+@dp.callback_query(F.data == 'current')
+async def process_callback_user(callback_query: types.CallbackQuery, bot: Bot):
+    await bot.answer_callback_query(callback_query.id)
+    data = bot_db.get_current()
+    await callback_query.message.answer(f"Текущий курс \n"
+                                        f"Юань: {data[0]} \n"
+                                        f"Доллар: {data[1]} \n"
+                                        f"Евро: {data[2]} \n")
 
 
 @dp.message(YuanState.new_yuan_cur)
@@ -95,6 +106,20 @@ async def echo_message(msg: types.Message):
         euro_btn = types.InlineKeyboardButton(text='ЕВРО', callback_data=Exchage(currency='euro', num=int(msg.text)).pack())
         exchange_markup = InlineKeyboardBuilder().add(yuan_btn).add(dollar_btn).add(euro_btn)
         await msg.reply('Выберете валюту в которую хотите перевести', reply_markup=exchange_markup.as_markup())
+    try:
+        num_list = [int(i) for i in msg.text.split()]
+        if len(num_list) > 1:
+            await msg.reply(f'Сумма цифр {sum(num_list)}')
+            yuan_btn = types.InlineKeyboardButton(text='ЮАНЬ',
+                                                  callback_data=Exchage(currency='yuan', num=sum(num_list)).pack())
+            dollar_btn = types.InlineKeyboardButton(text='ДОЛЛАР',
+                                                    callback_data=Exchage(currency='dollar', num=sum(num_list)).pack())
+            euro_btn = types.InlineKeyboardButton(text='ЕВРО',
+                                                  callback_data=Exchage(currency='euro', num=sum(num_list)).pack())
+            exchange_markup = InlineKeyboardBuilder().add(yuan_btn).add(dollar_btn).add(euro_btn)
+            await msg.reply('Выберете валюту в которую хотите перевести', reply_markup=exchange_markup.as_markup())
+    except Exception:
+        pass
 
 
 @dp.callback_query(Exchage.filter(F.currency == 'yuan'))
