@@ -35,6 +35,12 @@ bot_db = BoT_DB('/data/courses.db')
 dp = Dispatcher(storage=MemoryStorage())
 
 
+@dp.message(Command(commands=['help']))
+async def admin_command(msg: types.Message):
+    await msg.reply('Для получения цены в другой валюте введите боту число (Пример: 100) \n'
+                    'Если хотите ввести несколько чисел то сделайте это через пробел (Пример: 100 200 300)')
+
+
 @dp.message(Command(commands=['admin']))
 async def admin_command(msg: types.Message):
     if msg.from_user.id in ADMINS:
