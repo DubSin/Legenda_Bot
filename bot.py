@@ -58,9 +58,9 @@ async def process_callback_user(callback_query: types.CallbackQuery, bot: Bot):
     await bot.answer_callback_query(callback_query.id)
     data = bot_db.get_current()
     await callback_query.message.answer(f"Текущий курс \n"
-                                        f"Юань: {data[0]} \n"
-                                        f"Доллар: {data[1]} \n"
-                                        f"Евро: {data[2]} \n")
+                                        f"Юань: {data[1]} \n"
+                                        f"Доллар: {data[2]} \n"
+                                        f"Евро: {data[3]} \n")
 
 
 @dp.message(YuanState.new_yuan_cur)
