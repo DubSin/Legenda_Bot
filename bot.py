@@ -104,54 +104,12 @@ async def password(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-@dp.message()
-async def echo_message(msg: types.Message):
-    if msg.text.isdigit():
-        yuan_btn = types.InlineKeyboardButton(text='ЮАНЬ', callback_data=Exchage(currency='yuan', num=int(msg.text)).pack())
-        dollar_btn = types.InlineKeyboardButton(text='ДОЛЛАР', callback_data=Exchage(currency='dollar', num=int(msg.text)).pack())
-        euro_btn = types.InlineKeyboardButton(text='ЕВРО', callback_data=Exchage(currency='euro', num=int(msg.text)).pack())
-        exchange_markup = InlineKeyboardBuilder().add(yuan_btn).add(dollar_btn).add(euro_btn)
-        await msg.reply('Выберете валюту в которую хотите перевести', reply_markup=exchange_markup.as_markup())
-    try:
-        num_list = [int(i) for i in msg.text.split()]
-        if len(num_list) > 1:
-            await msg.reply(f'Сумма цифр {sum(num_list)}')
-            yuan_btn = types.InlineKeyboardButton(text='ЮАНЬ',
-                                                  callback_data=Exchage(currency='yuan', num=sum(num_list)).pack())
-            dollar_btn = types.InlineKeyboardButton(text='ДОЛЛАР',
-                                                    callback_data=Exchage(currency='dollar', num=sum(num_list)).pack())
-            euro_btn = types.InlineKeyboardButton(text='ЕВРО',
-                                                  callback_data=Exchage(currency='euro', num=sum(num_list)).pack())
-            exchange_markup = InlineKeyboardBuilder().add(yuan_btn).add(dollar_btn).add(euro_btn)
-            await msg.reply('Выберете валюту в которую хотите перевести', reply_markup=exchange_markup.as_markup())
-    except Exception:
-        pass
-
-
-@dp.callback_query(Exchage.filter(F.currency == 'yuan'))
-async def process_callback_user(callback_query: types.CallbackQuery, bot: Bot, callback_data: Exchage):
-    await bot.answer_callback_query(callback_query.id)
-    cur = bot_db.get_yuan()[0]
-    price = ceil(callback_data.num / float(cur))
-    await callback_query.message.answer(f'{price}')
-
-
-@dp.callback_query(Exchage.filter(F.currency == 'dollar'))
-async def process_callback_user(callback_query: types.CallbackQuery, bot: Bot, callback_data: Exchage):
-    await bot.answer_callback_query(callback_query.id)
-    cur = bot_db.get_dollar()[0]
-    price = ceil(callback_data.num / float(cur))
-    await callback_query.message.answer(f'{price}')
-
-
-@dp.callback_query(Exchage.filter(F.currency == 'euro'))
-async def process_callback_user(callback_query: types.CallbackQuery, bot: Bot, callback_data: Exchage):
-    await bot.answer_callback_query(callback_query.id)
-    cur = bot_db.get_euro()[0]
-    price = ceil(callback_data.num / float(cur))
-    await callback_query.message.answer(f'{price}')
-
-
+@dp.message(Command(commands='count'))
+async def count_price(message: types.Message):
+    web_app_keyboard = InlineKeyboardBuilder()
+    web_app_btn = types.InlineKeyboardButton(text='Открыть приложение', web_app=types.WebAppInfo(url='https://7e72-185-102-10-44.ngrok-free.app'))
+    web_app_keyboard.add(web_app_btn)
+    await message.reply('Запустить приложение', reply_markup=web_app_keyboard.as_markup())
 
 
 async def main() -> None:

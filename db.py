@@ -3,7 +3,7 @@ import sqlite3
 
 class BoT_DB:
     def __init__(self, db):
-        self.db = sqlite3.connect(db)
+        self.db = sqlite3.connect(db, check_same_thread=False)
         self.cursor = self.db.cursor()
 
     def get_yuan(self):
